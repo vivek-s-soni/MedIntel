@@ -191,18 +191,18 @@ class PrescribedMedicineViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(status=status)
         return queryset
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], url_path='stop')
     def stop_medication(self, request, pk=None):
         medicine = self.get_object()
-        medicine.status = 'Cancelled'
-        medicine.save()
-        today = datetime.date.today()
-        now_time = datetime.datetime.now().time()
-        medicine.schedules.filter(scheduled_date__gt=today, status='Pending').delete()
-        medicine.schedules.filter(scheduled_date=today, scheduled_time__gt=now_time, status='Pending').delete()
-        return Response({'message': 'Medication stopped successfully', 'status': medicine.status})
+        med_id = medicine.id
+        med_name = medicine.name
+        if medicine.prescription and isinstance(medicine.prescription.medicines, list):
+            medicine.prescription.medicines = [m for m in medicine.prescription.medicines if m.get('name') != med_name]
+            medicine.prescription.save()
+        medicine.delete()
+        return Response({'message': 'Medication stopped and deleted from database successfully', 'id': med_id})
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], url_path='extend')
     def extend_medication(self, request, pk=None):
         medicine = self.get_object()
         days = int(request.data.get('days', 0))
@@ -210,10 +210,15 @@ class PrescribedMedicineViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Days must be a positive integer'}, status=status.HTTP_400_BAD_REQUEST)
         original_end_date = medicine.end_date
         new_end_date = original_end_date + datetime.timedelta(days=days)
-        medicine.duration += days
+        medicine.duration = int(medicine.duration) + days
         medicine.end_date = new_end_date
         medicine.status = 'Active'
         medicine.save()
+        if medicine.prescription and isinstance(medicine.prescription.medicines, list):
+            for m in medicine.prescription.medicines:
+                if m.get('name') == medicine.name:
+                    m['duration'] = f"{medicine.duration} Days"
+            medicine.prescription.save()
         generate_medication_schedules(medicine, original_end_date + datetime.timedelta(days=1), new_end_date)
         return Response({
             'message': f'Medication extended by {days} days',
@@ -274,7 +279,7 @@ class MedicationScheduleViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(scheduled_date=date)
         return queryset
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], url_path='take')
     def mark_taken(self, request, pk=None):
         schedule = self.get_object()
         schedule.status = 'Taken'
@@ -289,7 +294,7 @@ class MedicationScheduleViewSet(viewsets.ModelViewSet):
 
         return Response(self.get_serializer(schedule).data)
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], url_path='undo')
     def undo_taken(self, request, pk=None):
         schedule = self.get_object()
         schedule.status = 'Pending'

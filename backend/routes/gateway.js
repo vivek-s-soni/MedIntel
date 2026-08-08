@@ -171,6 +171,26 @@ router.post('/appointments', authenticateToken, requireRole(['Patient']), async 
 
     const { doctor, date, time_slot, chief_complaint, payment_method } = req.body;
 
+    // ── Past date/time validation ─────────────────────────────────────────
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0]; // YYYY-MM-DD in UTC
+    // Convert to IST for comparison (UTC+5:30)
+    const istOffset = 5.5 * 60 * 60 * 1000;
+    const istNow = new Date(now.getTime() + istOffset);
+    const istTodayStr = istNow.toISOString().split('T')[0];
+    const istNowHHMM = istNow.toISOString().substring(11, 16); // HH:MM in IST
+
+    if (date < istTodayStr) {
+      return res.status(400).json({ error: 'Cannot book an appointment for a past date.' });
+    }
+    if (date === istTodayStr) {
+      const slotHHMM = (time_slot || '').substring(0, 5);
+      if (slotHHMM <= istNowHHMM) {
+        return res.status(400).json({ error: `The selected time slot (${slotHHMM}) has already passed. Please choose a future time slot.` });
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────
+
     // Check availability
     const slotsRes = await axios.get(`${DJANGO_URL}/api/appointments/slots/?doctor=${doctor}&date=${date}`);
     if (slotsRes.data.is_leave) {

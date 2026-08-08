@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { adminAPI, doctorAPI, appointmentAPI, authAPI } from '../api';
 import { 
   Users, CheckSquare, Calendar, DollarSign, ShieldAlert, Trash, Check, X,
-  Plus, Edit3
+  Plus, Edit3, BarChart2, TrendingUp
 } from 'lucide-react';
 import Toast from '../components/Toast';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 export const AdminDashboard = ({ tab }) => {
   const [toast, setToast] = useState(null);

@@ -386,9 +386,18 @@ export const PatientDashboard = ({ tab }) => {
       const allSlots = [];
       let current = new Date(`2026-01-01T${selectedDoctor.working_hours_start}`);
       const end = new Date(`2026-01-01T${selectedDoctor.working_hours_end}`);
+
+      // Determine if the selected date is today — used to filter past slots
+      const todayStr = new Date().toISOString().split('T')[0];
+      const isToday = date === todayStr;
+      const nowHHMM = new Date().toTimeString().substring(0, 5); // e.g. "14:30"
+
       while (current < end) {
         const timeStr = current.toTimeString().substring(0, 5);
-        if (!res.data.booked_slots.includes(timeStr)) {
+        const alreadyBooked = res.data.booked_slots.includes(timeStr);
+        // Skip past slots when booking for today
+        const isPast = isToday && timeStr <= nowHHMM;
+        if (!alreadyBooked && !isPast) {
           allSlots.push(timeStr);
         }
         current.setMinutes(current.getMinutes() + 30);
@@ -421,9 +430,17 @@ export const PatientDashboard = ({ tab }) => {
       const allSlots = [];
       let current = new Date(`2026-01-01T${doctorObj.working_hours_start}`);
       const end = new Date(`2026-01-01T${doctorObj.working_hours_end}`);
+
+      // Filter past slots when rescheduling to today
+      const todayStr = new Date().toISOString().split('T')[0];
+      const isToday = date === todayStr;
+      const nowHHMM = new Date().toTimeString().substring(0, 5);
+
       while (current < end) {
         const timeStr = current.toTimeString().substring(0, 5);
-        if (!res.data.booked_slots.includes(timeStr)) {
+        const alreadyBooked = res.data.booked_slots.includes(timeStr);
+        const isPast = isToday && timeStr <= nowHHMM;
+        if (!alreadyBooked && !isPast) {
           allSlots.push(timeStr);
         }
         current.setMinutes(current.getMinutes() + 30);
@@ -437,6 +454,23 @@ export const PatientDashboard = ({ tab }) => {
   const handleBookAppt = async (e) => {
     e.preventDefault();
     if (bookingLoading) return;
+
+    // ── Past date/time guard ──────────────────────────────────────
+    const todayStr = new Date().toISOString().split('T')[0];
+    if (bookingDate < todayStr) {
+      showToast('Cannot book an appointment in the past.', 'error');
+      return;
+    }
+    if (bookingDate === todayStr) {
+      const nowHHMM = new Date().toTimeString().substring(0, 5);
+      const slotHHMM = selectedSlot.substring(0, 5);
+      if (slotHHMM <= nowHHMM) {
+        showToast('This time slot has already passed for today. Please pick a later slot.', 'error');
+        return;
+      }
+    }
+    // ─────────────────────────────────────────────────────────────
+
     setBookingLoading(true);
     try {
       const apptRes = await appointmentAPI.bookAppointment({

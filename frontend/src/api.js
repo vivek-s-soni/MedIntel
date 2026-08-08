@@ -55,13 +55,13 @@ export const prescriptionAPI = {
 };
 
 export const medicationAPI = {
-  getMedicines: (params) => api.get('/prescribed-medicines', { params }),
-  stopMedicine: (id) => api.post(`/prescribed-medicines/${id}/stop`),
-  extendMedicine: (id, days) => api.post(`/prescribed-medicines/${id}/extend`, { days }),
-  getAdherence: (patientId) => api.get('/prescribed-medicines/adherence', { params: { patient: patientId } }),
-  getSchedules: (params) => api.get('/medication-schedules', { params }),
-  takeDose: (id) => api.post(`/medication-schedules/${id}/take`),
-  undoDose: (id) => api.post(`/medication-schedules/${id}/undo`),
+  getMedicines: (params) => api.get('/prescribed-medicines/', { params }),
+  stopMedicine: (id) => api.post(`/prescribed-medicines/${id}/stop/`),
+  extendMedicine: (id, days) => api.post(`/prescribed-medicines/${id}/extend/`, { days }),
+  getAdherence: (patientId) => api.get('/prescribed-medicines/adherence/', { params: { patient: patientId } }),
+  getSchedules: (params) => api.get('/medication-schedules/', { params }),
+  takeDose: (id) => api.post(`/medication-schedules/${id}/take/`),
+  undoDose: (id) => api.post(`/medication-schedules/${id}/undo/`),
 };
 
 export const reportAPI = {

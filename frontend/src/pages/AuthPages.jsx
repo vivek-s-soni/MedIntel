@@ -9,7 +9,7 @@ export const AuthPage = ({ mode }) => {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
@@ -141,22 +141,20 @@ export const AuthPage = ({ mode }) => {
                 <button
                   type="button"
                   onClick={() => setRole('Patient')}
-                  className={`py-2 px-4 rounded-xl border text-sm font-semibold transition-all ${
-                    role === 'Patient'
+                  className={`py-2 px-4 rounded-xl border text-sm font-semibold transition-all ${role === 'Patient'
                       ? 'bg-primary-600 border-primary-600 text-white shadow-md'
                       : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/40 text-slate-600 dark:text-slate-400'
-                  }`}
+                    }`}
                 >
                   Patient
                 </button>
                 <button
                   type="button"
                   onClick={() => setRole('Doctor')}
-                  className={`py-2 px-4 rounded-xl border text-sm font-semibold transition-all ${
-                    role === 'Doctor'
+                  className={`py-2 px-4 rounded-xl border text-sm font-semibold transition-all ${role === 'Doctor'
                       ? 'bg-primary-600 border-primary-600 text-white shadow-md'
                       : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/40 text-slate-600 dark:text-slate-400'
-                  }`}
+                    }`}
                 >
                   Doctor
                 </button>
@@ -329,7 +327,7 @@ export const AuthPage = ({ mode }) => {
               onClick={() => navigate('/forgot-password')}
               className="text-xs font-semibold text-primary-600 dark:text-primary-400 hover:underline"
             >
-              Forgot Password?
+
             </button>
           </div>
         )}
