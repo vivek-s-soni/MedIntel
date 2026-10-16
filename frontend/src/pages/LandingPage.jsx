@@ -20,7 +20,7 @@ const LandingPage = () => {
           <div className="p-2 bg-primary-100 dark:bg-primary-950/40 text-primary-600 dark:text-primary-400 rounded-xl">
             <HeartPulse className="w-6 h-6 animate-pulse" />
           </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+          <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-teal-600 bg-clip-text text-transparent">
   MedIntel
 </span>
         </div>
