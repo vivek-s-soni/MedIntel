@@ -20,9 +20,9 @@ const LandingPage = () => {
           <div className="p-2 bg-primary-100 dark:bg-primary-950/40 text-primary-600 dark:text-primary-400 rounded-xl">
             <HeartPulse className="w-6 h-6 animate-pulse" />
           </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-indigo-600 bg-clip-text text-transparent">
-            MedIntel
-          </span>
+          <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+  MedIntel
+</span>
         </div>
         <div className="flex items-center gap-4">
           <button 
@@ -33,8 +33,7 @@ const LandingPage = () => {
           </button>
           <button 
             onClick={() => navigate('/register')}
-            className="text-sm font-bold bg-gradient-to-r from-primary-600 to-indigo-600 hover:from-primary-700 hover:to-indigo-700 text-white px-5 py-2 rounded-xl transition-all shadow-md shadow-primary-500/10"
-          >
+className="text-sm font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-5 py-2 rounded-xl transition-all shadow-md shadow-emerald-500/10"          >
             Get Started
           </button>
         </div>
