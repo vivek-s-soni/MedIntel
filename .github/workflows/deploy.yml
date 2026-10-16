@@ -1,0 +1,72 @@
+name: CI-CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build frontend
+        run: cd frontend && npm ci && VITE_API_URL=/api npm run build
+
+      - name: Install backend dependencies
+        run: cd backend && npm ci --omit=dev
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Django system check
+        run: |
+          cd ai_service
+          pip install -r requirements.txt
+          python manage.py check
+
+  deploy:
+    needs: ci
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up SSH
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
+
+      - name: Copy code to server
+        env:
+          HOST: ${{ secrets.EC2_HOST }}
+          USER: ${{ secrets.EC2_USER }}
+        run: |
+          rsync -az \
+            --exclude '.git' --exclude '.github' --exclude 'node_modules' \
+            --exclude '.env' --exclude 'ai_service/db.sqlite3' \
+            --exclude 'backend/uploads' --exclude 'dist' \
+            ./ "$USER@$HOST:~/MedicalApp/"
+
+      - name: Build and restart
+        env:
+          HOST: ${{ secrets.EC2_HOST }}
+          USER: ${{ secrets.EC2_USER }}
+        run: |
+          ssh "$USER@$HOST" "cd ~/MedicalApp && \
+            sudo docker compose build django && \
+            sudo docker compose build node && \
+            sudo docker compose build frontend && \
+            sudo docker compose up -d"
