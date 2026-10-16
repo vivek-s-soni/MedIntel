@@ -1,0 +1,33 @@
+services:
+  django:
+    build: ./ai_service
+    command: sh -c "python manage.py migrate && gunicorn ai_service.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120"
+    volumes:
+      - ./ai_service/db.sqlite3:/app/db.sqlite3
+    restart: unless-stopped
+
+  node:
+    build: ./backend
+    environment:
+      - PORT=5000
+      - DJANGO_URL=http://django:8000
+      - FRONTEND_URL=http://3.104.59.181
+      - JWT_SECRET=CGcg8klEFpYLh6rdv21ut3InVyNODZRsim90xA5qf7PjKXM4
+    volumes:
+      - ./backend/uploads:/app/uploads
+    expose:
+      - "5000"
+    depends_on:
+      - django
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: /api
+    ports:
+      - "80:80"
+    depends_on:
+      - node
+    restart: unless-stopped

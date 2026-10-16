@@ -19,10 +19,16 @@ warnings.filterwarnings('ignore')
 # 1. DISEASE PREDICTION ENGINE  (upgraded)
 # ============================================================
 
-DATASET_PATH = os.path.join(
+MULTI_SAMPLE_DATASET_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    'enhanced_dataset_multi_sample.csv'
+)
+SINGLE_SAMPLE_DATASET_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
     'enhanced_dataset_general_medicine.csv'
 )
+DATASET_PATH = MULTI_SAMPLE_DATASET_PATH if os.path.exists(MULTI_SAMPLE_DATASET_PATH) else SINGLE_SAMPLE_DATASET_PATH
+
 
 # ------------------------------------------------------------------
 # 1-A  Symptom Normalisation Map
