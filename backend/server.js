@@ -18,6 +18,26 @@ app.use(cors({
 // Body Parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
+
+// Docs only exist when explicitly enabled
+if (process.env.ENABLE_DOCS === 'true') {
+  const spec = swaggerJsdoc({
+    definition: {
+      openapi: '3.0.0',
+      info: { title: 'MedIntel API', version: '1.0.0' },
+      components: {
+        securitySchemes: {
+          bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+        },
+      },
+    },
+    apis: ['./routes/*.js'],
+  });
+  // Mounted at /docs, NOT under /api, so Nginx never forwards it
+  app.use('/docs', swaggerUi.serve, swaggerUi.setup(spec));
+}
 
 // Serve Uploaded Files static folder
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
