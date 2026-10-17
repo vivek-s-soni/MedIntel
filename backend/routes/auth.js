@@ -88,6 +88,24 @@ router.post('/register', async (req, res) => {
     res.status(500).json({ error: 'Server registration error' });
   }
 });
+/**
+ * @openapi
+ * /api/auth/login:
+ *   post:
+ *     summary: Log in
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email: { type: string }
+ *               password: { type: string }
+ *     responses:
+ *       200: { description: Token returned }
+ *       401: { description: Invalid credentials }
+ */
 
 // Login User
 router.post('/login', async (req, res) => {
