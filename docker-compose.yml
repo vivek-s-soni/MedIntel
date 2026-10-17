@@ -15,8 +15,8 @@ services:
       - JWT_SECRET=CGcg8klEFpYLh6rdv21ut3InVyNODZRsim90xA5qf7PjKXM4
     volumes:
       - ./backend/uploads:/app/uploads
-    expose:
-      - "5000"
+     ports:
+      - "127.0.0.1:5000:5000"
     depends_on:
       - django
     restart: unless-stopped
