@@ -13,7 +13,7 @@ services:
       - DJANGO_URL=http://django:8000
       - FRONTEND_URL=http://3.104.59.181
       - JWT_SECRET=CGcg8klEFpYLh6rdv21ut3InVyNODZRsim90xA5qf7PjKXM4
-       - ENABLE_DOCS=true
+      - ENABLE_DOCS=true
     volumes:
       - ./backend/uploads:/app/uploads
      ports:
